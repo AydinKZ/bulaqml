@@ -1,0 +1,135 @@
+networks:
+  bulaq-net:
+    external: false
+
+services:
+  metro-hel-mqtt: #container that produces live values stream from Helsinki metro, good for testing remove if not required
+    build:
+      context: ./metro-hel-mqtt
+      dockerfile: Dockerfile
+    container_name: metro-hel-mqtt
+    networks:
+      - bulaq-net
+    restart: unless-stopped
+    environment:
+      COLLECTOR_ID: hfpmetro01
+      IDENTITY_MODE: compact_path
+      MQTT_HOST: "mqtt.hsl.fi"
+      MQTT_PORT: 8883
+      MQTT_TOPIC: "/hfp/v2/journey/ongoing/vp/metro/#"
+      MQTT_KEEPALIVE: 60
+      MQTT_QOS_OUT: 0
+      REST_URL: "http://bulaq-scorer:8080/ingest/batch"
+      REST_TIMEOUT_SEC: 15
+      LEARNED_TAGS_CSV: "/data/learned_tags.csv"
+      POST_ERRORS_CSV: "/data/post_errors.csv"
+      POST_NULL_VALUES: false
+      HTTP_RETRIES: 2
+      HTTP_RETRY_BACKOFF_SEC: 1.0
+    volumes:
+      - ./data:/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "python", "-c", "print('ok')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  bulaq-scorer:
+    container_name: bulaq-scorer
+    build:
+      context: ./bulaq-scorer
+    networks:
+      - bulaq-net
+    ports:
+      - "8076:8080"
+    mem_limit: 2g #increase if you planning heavy tags load
+    cpus: 2.0
+    environment:
+      # scorer API logs
+      LOG_LEVEL: "INFO"
+
+      #KAFKA producer
+      KAFKA_ENABLED: "0"  #set 1 if you want to stream events to kafka broker
+      KAFKA_BOOTSTRAP_SERVERS: "redpanda:9092"
+      KAFKA_SECURITY_PROTOCOL: "PLAINTEXT"
+      KAFKA_CLIENT_ID: "bulaq-scorer"
+      KAFKA_EVENTS_TOPIC: "bulaq-events"
+      KAFKA_P_SECURITY_PROTOCOL: "SASL_PLAINTEXT"
+      KAFKA_P_SASL_MECHANISM: "SCRAM-SHA-256"
+      KAFKA_P_USERNAME: "kafkauser"
+      KAFKA_P_PASSWORD: "----"  #recommended to move creds to .env file
+
+      # Syslog 
+      SYSLOG_ENABLED: "0" #set 1 if you have syslog collector
+      SYSLOG_HOST: "192.168.0.1"   # your syslog collector
+      SYSLOG_PORT: "514"
+      SYSLOG_FACILITY: "local0"
+      SYSLOG_TAG: "bulaq-scorer"
+
+      # model / memory safety
+      MODEL_MAX_KEYS: "5000"
+      MODEL_TTL_SEC: "86400"
+      SNAPSHOT_POINTS: "200"
+      CAT_MAX_KEYS: "50"
+
+      # Postgres registry (optional)
+      PG_DSN: "postgresql://pgadmin:hJ2gZR@bulaq-pg:5432/bulaq_db" #recommended to move creds to .env file
+      ENABLE_TAG_OVERRIDES: "1"
+      OVERRIDE_CACHE_TTL_SEC: "60"
+      CONFIG_USER: "mluser"
+      CONFIG_NAME: "river-default"
+
+      # http 
+      HTTP_MAX_INFLIGHT: "1"
+      HTTP_BATCH_SIZE: "20"
+      HTTP_BATCH_MAX_LAT_MS: "200"
+      HTTP_TIMEOUT_SEC: "15"
+      BACKPRESSURE_MODE: "pause"
+
+
+    restart: unless-stopped
+
+  bulaq-ui:  # streamlit UI
+    container_name: bulaq-ui
+    build:
+      context: ./bulaq-ui
+    networks:
+      - bulaq-net
+    ports:
+      - "8501:8501"
+    environment:
+      SCORER_BASE_URL: "http://bulaq-scorer:8080"
+      STREAMLIT_BROWSER_GATHER_USAGE_STATS: "false"
+      AI_ASSISTANT_ENABLED: "0" # if you want LLM to explain the settings and anomalies
+      AI_API_KEY: "sk-*******" #recommended to move creds to .env file
+      AI_BASE_URL: "https://api.moonshot.ai/v1" # tested with Moonshot Kimi, any OpenAI API compatible llm shall work
+      AI_MODEL: "kimi-latest"
+      AI_INTERVAL_MIN: "10"
+      AI_MAX_UUIDS: "5"
+      AI_MAX_ROWS_PER_UUID: "40"
+    depends_on:
+      - bulaq-scorer
+    restart: unless-stopped
+
+  postgres: #backend DB
+    container_name: bulaq-pg
+    image: postgres:18
+    environment:
+      POSTGRES_USER: "pgadmin"
+      POSTGRES_PASSWORD: "hJ2gZR" #recommended to move creds to .env file
+      POSTGRES_DB: bulaq_db
+      # Option A (simple): add a blanket "host all all all md5" to pg_hba.conf
+      POSTGRES_HOST_AUTH_METHOD: md5
+      # Option B (equivalent, done at initdb time):
+      POSTGRES_INITDB_ARGS: "--auth-host=md5 --auth-local=md5"
+    command: >
+      postgres
+      -c wal_level=logical
+      -c max_wal_senders=10
+      -c max_replication_slots=10
+      -c shared_preload_libraries=pgoutput
+    shm_size: 128mb
+    networks:
+      - bulaq-net
