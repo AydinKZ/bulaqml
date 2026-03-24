@@ -2,7 +2,7 @@
 
 BulaqML is a beginner-friendly proof of concept for building a real-time anomaly detection service using online (streaming) machine learning with River ML library https://riverml.xyz/latest/.
 
-It demonstrates a per-signal anomaly detection workflow where each signal (UUID/tag):
+It is a per-signal anomaly detection workflow where each signal (UUID/tag):
 
 - is discovered automatically,
 - can be assigned its own anomaly detection model,
