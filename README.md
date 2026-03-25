@@ -138,8 +138,6 @@ More details on HFP API data structure in [their documentation] (https://digitra
 - ✅ Runtime stats and monitoring
 
 ---
-### GUI examples
----
 ## Architecture
 
 
