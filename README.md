@@ -13,7 +13,7 @@ It also includes a built-in LLM assistant layer for anomaly review and detector 
 
 ### Web UI
 
-![Tag Workspace](docs/images/tag_workspace.png) ![EMWA Trend](docs/images/emwa_trend.png)
+![Tag Workspace](docs/images/tag_workspace.png) ![EMWA Trend](docs/images/ewma_trend.png)
 ---
 
 ## ⚠️ Not Production Ready
