@@ -11,6 +11,9 @@ It is a per-signal anomaly detection workflow where each signal (UUID/tag):
 
 It also includes a built-in LLM assistant layer for anomaly review and detector tuning using your own API key.
 
+### Web UI
+
+![Tag Workspace](docs/images/tag_workspace.png) ![EMWA Trend](docs/images/emwa_trend.png)
 ---
 
 ## ⚠️ Not Production Ready
