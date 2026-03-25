@@ -77,7 +77,7 @@ To enable Kafka or Syslog forwarding, edit the relevant environment variables in
 
 A separate REST API README is [available here ](docs/bulaqml_api_reference.md)
 
-If you don't like the metro example, additional test sets using curl are [documented here] (docs/bulaqml_curl_tests.md)
+If you don't like the metro example, additional test sets using curl are [documented here](docs/bulaqml_curl_tests.md)
 
 ---
 📡 Example Input
