@@ -1,6 +1,6 @@
 ## 🌊 BulaqML — Streaming Anomaly Detection (POC)
 
-BulaqML is a beginner-friendly proof of concept for building a real-time anomaly detection service using online (streaming) machine learning with River ML library https://riverml.xyz/latest/.
+BulaqML is a beginner-friendly proof of concept for building a real-time anomaly detection service using online (streaming) machine learning with [River ML library ](https://riverml.xyz/latest/).
 
 It is a per-signal anomaly detection workflow where each signal (UUID/tag):
 
@@ -17,7 +17,7 @@ It also includes a built-in LLM assistant layer for anomaly review and detector 
 
 This project is a proof of concept and is **not** production-ready.
 
-It currently lacks several production-grade capabilities, including hardening, full security controls, and more complete pre-processing and post-processing features. That said, it is a practical sandbox for experimenting with online anomaly detection and can be integrated with observability tools such as Grafana or Elastic.
+It currently lacks several production-grade capabilities, including hardening, full security controls, and more complete pre-processing and post-processing features. That said, it is still fun sandbox for experimenting with online anomaly detection and can be integrated with observability tools such as Grafana or Elastic.
 
 ---
 
@@ -59,7 +59,7 @@ After startup, open:
 - Web UI: http://localhost:8501
 - REST API: http://localhost:8076
 
-The metro-hel-mqtt container starts automatically and begins feeding live Helsinki Metro test data into the system.
+The 🚇metro-hel-mqtt container starts automatically and begins feeding live Helsinki Metro test data into the system.
 
 Typical first steps:
 
@@ -73,18 +73,11 @@ To enable Kafka or Syslog forwarding, edit the relevant environment variables in
 
 ---
 
-###📘 REST API Reference
+###📘 REST API Reference and test scripts
 
-A separate REST API README with endpoint details and curl examples is planned.
+A separate REST API README is [available here ](docs/bulaqml_api_reference.md)
 
-For now, the API is intended for:
-
-- single-event ingestion,
-- batch ingestion,
-- viewing runtime state,
-- managing detector configuration.
-
-
+If you don't like the metro example, additional test sets using curl are [documented here] (docs/bulaqml_curl_tests.md)
 
 ---
 📡 Example Input
@@ -115,7 +108,7 @@ Refer to the REST API documentation for batch ingestion and typed ingestion exam
 ```
 
 ---
-### metro-hel-mqtt
+### 🚇 metro-hel-mqtt
 metro-hel-mqtt is an auxiliary test container that forwards real-time Helsinki Metro data into BulaqML.
 It is a lightweight ingestion bridge that subscribes to the Helsinki HFP (High Frequency Positioning) MQTT feed, dynamically learns time-series tags, and converts selected JSON fields into individual signal streams.
 Each metric, such as speed, latitude, longitude, or route, is mapped to a stable signal identity derived from the MQTT topic:(`/hfp/.../metro/<oper>/<veh>/<field>`), with optional compact identifiers like `hfp.metro.oper_50.veh_137.spd`. The bridge maintains an in-memory and CSV-backed tag registry and generates deterministic UUIDs using `xxh3`.
@@ -126,6 +119,8 @@ Useful frequently changing fields include:
 - Categorical: route
 
 The feed does not naturally provide many useful boolean examples, so boolean testing is better done through manual REST examples.
+If you feel dedicated enough you can even try to score more dense traffic from busses and trams.
+More details on HFP API data structure in [their documentation] (https://digitransit.fi/en/developers/apis/5-realtime-api/vehicle-positions/high-frequency-positioning/#examples)
 
 ---
 
