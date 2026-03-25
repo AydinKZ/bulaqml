@@ -59,7 +59,7 @@ After startup, open:
 - Web UI: http://localhost:8501
 - REST API: http://localhost:8076
 
-The 🚇metro-hel-mqtt container starts automatically and begins feeding live Helsinki Metro test data into the system.
+The 🚇metro-hel-mqtt container starts automatically and feeds live Helsinki Metro test data into the system.
 
 Typical first steps:
 
