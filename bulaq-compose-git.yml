@@ -28,8 +28,6 @@ services:
       HTTP_RETRY_BACKOFF_SEC: 1.0
     volumes:
       - ./data:/data
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     healthcheck:
       test: ["CMD", "python", "-c", "print('ok')"]
       interval: 30s
@@ -58,8 +56,8 @@ services:
       KAFKA_EVENTS_TOPIC: "bulaq-events"
       KAFKA_P_SECURITY_PROTOCOL: "SASL_PLAINTEXT"
       KAFKA_P_SASL_MECHANISM: "SCRAM-SHA-256"
-      KAFKA_P_USERNAME: "kafkauser"
-      KAFKA_P_PASSWORD: "----"  #recommended to move creds to .env file
+      KAFKA_P_USERNAME: "${KAFKA_P_USERNAME}"
+      KAFKA_P_PASSWORD: "${KAFKA_P_PASSWORD}"  #recommended to move creds to .env file
 
       # Syslog 
       SYSLOG_ENABLED: "0" #set 1 if you have syslog collector
@@ -75,7 +73,7 @@ services:
       CAT_MAX_KEYS: "50"
 
       # Postgres registry (optional)
-      PG_DSN: "postgresql://pgadmin:hJ2gZR@bulaq-pg:5432/bulaq_db" #recommended to move creds to .env file
+      PG_DSN: "postgresql://pgadmin:${POSTGRES_PASSWORD}@bulaq-pg:5432/bulaq_db" #recommended to move creds to .env file
       ENABLE_TAG_OVERRIDES: "1"
       OVERRIDE_CACHE_TTL_SEC: "60"
       CONFIG_USER: "mluser"
@@ -103,7 +101,7 @@ services:
       SCORER_BASE_URL: "http://bulaq-scorer:8080"
       STREAMLIT_BROWSER_GATHER_USAGE_STATS: "false"
       AI_ASSISTANT_ENABLED: "0" # if you want LLM to explain the settings and anomalies
-      AI_API_KEY: "sk-*******" #recommended to move creds to .env file
+      AI_API_KEY: "${AI_API_KEY}" #recommended to move creds to .env file
       AI_BASE_URL: "https://api.moonshot.ai/v1" # tested with Moonshot Kimi, any OpenAI API compatible llm shall work
       AI_MODEL: "kimi-latest"
       AI_INTERVAL_MIN: "10"
@@ -118,7 +116,7 @@ services:
     image: postgres:18
     environment:
       POSTGRES_USER: "pgadmin"
-      POSTGRES_PASSWORD: "hJ2gZR" #recommended to move creds to .env file
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}" #recommended to move creds to .env file
       POSTGRES_DB: bulaq_db
       # Option A (simple): add a blanket "host all all all md5" to pg_hba.conf
       POSTGRES_HOST_AUTH_METHOD: md5
