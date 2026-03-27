@@ -37,23 +37,37 @@ Make sure you have the following installed:
 
 From the repository root, run:
 
-#### Linux / macOS
 ```bash
+# ===== Bulaq sandbox Runnin on linux=====
+
+# Postgres password (mandatory)
+export POSTGRES_PASSWORD=change_me 
+#use $env:POSTGRES_USER=change_me style for power shell
+
+# Kafka (optional)
+# export KAFKA_P_USERNAME=kafkauser
+# export KAFKA_P_PASSWORD=change_me
+
+# AI assistant (optional)
+# export AI_API_KEY=replace_me
+# those variables can be declared in .env file
 docker compose -f bulaq-compose-git.yml up -d --build
-```
-#### Powershell
-```
-docker compose -f .\bulaq-compose-git.yml up -d --build
-```
-#### Windows CMD
-```
-docker compose -f bulaq-compose-git.yml up -d --build
+
+# For Powershell use below starting command
+# docker compose -f .\bulaq-compose-git.yml up -d --build
+# =================================
 ```
 
 stop the stack
 ```bash
 docker compose -f bulaq-compose-git.yml down
 ```
+
+Stop the metro-hel-mqtt container, while keeping other containers
+```bash
+docker compose -f bulaq-compose-git.yml stop metro-hel-mqtt
+```
+
 ---
 #### Access the services
 
@@ -112,7 +126,7 @@ Refer to the REST API documentation for batch ingestion and typed ingestion exam
 
 ---
 ### 🚇 metro-hel-mqtt
-metro-hel-mqtt is an auxiliary test container that forwards real-time Helsinki Metro data into BulaqML.
+**metro-hel-mqtt** is an auxiliary test container that forwards real-time Helsinki Metro data into BulaqML.
 It is a lightweight ingestion bridge that subscribes to the Helsinki HFP (High Frequency Positioning) MQTT feed, dynamically learns time-series tags, and converts selected JSON fields into individual signal streams.
 Each metric, such as speed, latitude, longitude, or route, is mapped to a stable signal identity derived from the MQTT topic:(`/hfp/.../metro/<oper>/<veh>/<field>`), with optional compact identifiers like `hfp.metro.oper_50.veh_137.spd`. The bridge maintains an in-memory and CSV-backed tag registry and generates deterministic UUIDs using `xxh3`.
 
