@@ -1,15 +1,26 @@
-## 🌊 BulaqML — Streaming Anomaly Detection (POC)
+## 🌊 BulaqML — Streaming Anomaly Detection Sandbox
 
-BulaqML is a beginner-friendly proof of concept for building a real-time anomaly detection service using online (streaming) machine learning with [River ML library ](https://riverml.xyz/latest/).
+BulaqML is a beginner-friendly proof of concept for building a UI for real-time anomaly detection service using online (streaming) ML models with [River ML library ](https://riverml.xyz/latest/).
 
 It is a per-signal anomaly detection workflow where each signal (UUID/tag):
-
-- is discovered automatically,
-- can be assigned its own anomaly detection model,
-- moves through a simple lifecycle: **discovered → assigned → actively scored**,
-- can emit anomaly events through the web UI, REST API, Kafka, or Syslog.
+- is discovered automatically
+- can be assigned its own anomaly detection model
+- moves through a simple lifecycle: **discovered → assigned → actively scored**
+- can emit anomaly events through the web UI, REST API, Kafka, or Syslog
 
 It also includes a built-in LLM assistant layer for anomaly review and detector tuning using your own API key.
+
+---
+
+## ⚙️ Features
+
+- ✅ Per-UUID model assignment
+- ✅ Online learning (no retraining)
+- ✅ REST ingestion API
+- ✅ Lightweight Streamlit UI with AI assitant
+- ✅ Event-based anomaly reporting (WebUI, REST, Kafka, syslog)
+- ✅ Model assignment history (PostgreSQL)
+- ✅ Runtime stats and monitoring
 
 ### Web UI
 
@@ -137,24 +148,17 @@ Useful frequently changing fields include:
 
 The feed does not naturally provide many useful boolean examples, so boolean testing is better done through manual REST examples.
 If you feel dedicated enough you can even try to score more dense traffic from busses and trams.
-More details on HFP API data structure in [their documentation] (https://digitransit.fi/en/developers/apis/5-realtime-api/vehicle-positions/high-frequency-positioning/#examples)
+More details on HFP API data structure in [their documentation](https://digitransit.fi/en/developers/apis/5-realtime-api/vehicle-positions/high-frequency-positioning/#examples)
 
 ---
 
-## ⚙️ Features
+## ⚙️ Known issues
 
-- ✅ Per-UUID model assignment
-- ✅ Online learning (no retraining)
-- ✅ REST ingestion API
-- ✅ Event-based anomaly reporting
-- ✅ Model assignment history (PostgreSQL)
-- ✅ Lightweight Streamlit UI
-- ✅ Runtime stats and monitoring
-
+- Scrolling might freeze in WebUI, page refresh usually helps
 ---
 ## Architecture
 
-
+![SVG Arch](docs/images/bulaq-architecture.svg)
 ---
 
 ## 🧩 Implemented Models
@@ -231,8 +235,8 @@ Detects:
 
 ---
 
-###💡 Why Bulaq?
+### 💡Why Bulaq?
 
 “Bulaq” means brook or small stream in Kazakh:
 
-The project’s intent is a smaller and simpler stream ML-wrapper of River framework, focused specifically on anomaly detection.
+As the project’s intent is a smaller and simpler ML-wrapper UI for the River framework, focused specifically on anomaly detection.
